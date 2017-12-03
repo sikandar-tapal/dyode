@@ -3,12 +3,14 @@ config_version : 1.0
 config_date: 2017-07-25
 
 modules:
-  "Automate Modbus 1":
-     type: modbus
-     port: 9400
-     ip: 192.168.0.5
-     port_out: 502
-     registers:
-       - 0-105
-     coils:
-      - 0-1
+
+    "Siemens PLC":
+      type: s7
+      ip: 127.0.0.1
+      port_out: 102
+      databases:
+        1:
+          - 0-20
+          - 30-40
+        2:
+          - 0-10

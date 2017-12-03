@@ -7,6 +7,7 @@ import subprocess
 import multiprocessing
 import asyncore
 import modbus
+import s7
 import os
 
 # Logging
@@ -18,11 +19,17 @@ def launch_agents(module, properties):
     log.debug(module)
     log.debug(properties)
     if properties['type'] == 'folder':
+        log.error('Folder syncing is not supported on this version')
         exit()
     elif properties['type'] == 'modbus':
-        log.debug('Modbus agent : %s' % module)
+        log.debug('Modbus agent: %s' % module)
         modbus.modbus_loop(module, properties)
+    elif properties['type']  == 's7':
+        log.debug('Siemens agent: %s' % module)
+        # INSERT SIEMENS STUFF HERE
+        s7.s7_loop(module, properties)
     elif properties['type'] == 'screen':
+        log.error('Screen sharing is not supported on this version')
         exit()
 
 
@@ -35,7 +42,7 @@ if __name__ == '__main__':
     log.info('Configuration name : %s' % config['config_name'])
     log.info('Configuration version : %s' % config['config_version'])
     log.info('Configuration date : %s' % config['config_date'])
- 
+
     # Iterate on modules
     modules = config.get('modules')
     for module, properties in modules.iteritems():
