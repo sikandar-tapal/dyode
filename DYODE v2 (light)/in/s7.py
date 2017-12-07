@@ -3,6 +3,9 @@
 import sys
 import time
 import logging
+import serial
+import base64
+import binascii
 import pickle
 import snap7
 
@@ -27,9 +30,10 @@ def get_s7(properties):
 
     # For each database
     for i in s7_databases:
-
+        s7_data = {}
         # For each set of values
         for j in s7_databases[i]:
+
             s7_db_start_nb = j.split('-')[0]
             s7_db_end_nb = j.split('-')[1]
             log.debug('DB %s start value : %s' % (i, s7_db_start_nb))
@@ -42,10 +46,20 @@ def get_s7(properties):
                 s7_plc.connect(properties['ip'], 0, 1)
                 s7_read_values = s7_plc.db_read(int(i), int(s7_db_start_nb), int(s7_db_values_count))
                 s7_plc.disconnect()
-                s7_send_serial(pickle.dumps(s7_read_values), properties)
+                #print pickle.dumps(s7_read_values)
+                #print base64.b64encode(binascii.hexlify(s7_read_values))
+                #print base64.b64decode(base64.b64encode(binascii.hexlify(s7_read_values)))
+                s7_data[s7_db_start_nb] = s7_read_values
+
+                #s7_send_serial(pickle.dumps(s7_read_values), properties)
             except Exception, error:
                 log.debug('Error connecting to %s to read DB' % properties['ip'])
                 log.debug(str(error))
+        s7_values[i] = s7_data
+    print repr(s7_values)
+    print pickle.dumps(s7_values)
+    return s7_values
+
 
 def s7_send_serial(data, properties):
     data_length = len(data)
@@ -70,6 +84,8 @@ def s7_loop(module, properties):
     while(1):
         try:
             data = get_s7(properties)
+            # Send data trough serial
+            # s7_send_serial(pickle.dumps(data), properties)
         except Exception, error:
             log.debug('Error while updating s7 values')
             log.debug(str(error))

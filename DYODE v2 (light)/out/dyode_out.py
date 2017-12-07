@@ -4,6 +4,7 @@ import os
 import sys
 import yaml
 import modbus
+import s7
 import logging
 import multiprocessing
 import asyncore
@@ -15,12 +16,20 @@ log.setLevel(logging.DEBUG)
 
 
 def launch_agents(module, properties):
+    log.debug(module)
+    log.debug(properties)
     if properties['type'] == 'folder':
+        log.error('Folder syncing is not supported on this version')
         exit()
     elif properties['type'] == 'modbus':
-        log.debug('Modbus agent : %s' % module)
+        log.debug('Modbus agent: %s' % module)
         modbus.modbus_master(module, properties)
+    elif properties['type']  == 's7':
+        log.debug('Siemens agent: %s' % module)
+        # INSERT SIEMENS STUFF HERE
+        s7.s7_update(module, properties)
     elif properties['type'] == 'screen':
+        log.error('Screen sharing is not supported on this version')
         exit()
 
 
@@ -28,7 +37,7 @@ if __name__ == '__main__':
     with open('config.yaml', 'r') as config_file:
         config = yaml.load(config_file)
 
-    # Log infos about the configuration file
+    # Log info about the configuration file
     log.info('Loading config file')
     log.info('Configuration name : ' + config['config_name'])
     log.info('Configuration version : ' + str(config['config_version']))

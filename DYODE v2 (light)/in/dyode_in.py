@@ -26,7 +26,6 @@ def launch_agents(module, properties):
         modbus.modbus_loop(module, properties)
     elif properties['type']  == 's7':
         log.debug('Siemens agent: %s' % module)
-        # INSERT SIEMENS STUFF HERE
         s7.s7_loop(module, properties)
     elif properties['type'] == 'screen':
         log.error('Screen sharing is not supported on this version')
